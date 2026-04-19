@@ -21,9 +21,11 @@ type Config struct {
 	DBName     string
 	JWTSecret  string
 	AppEnv     string
-	PIXChave   string
-	PIXNome    string
-	PIXCidade  string
+	PIXChave     string
+	PIXNome      string
+	PIXCidade    string
+	AsaasAPIKey  string
+	AsaasBaseURL string
 }
 
 // Load carrega as variáveis de ambiente do arquivo .env
@@ -41,9 +43,11 @@ func Load() *Config {
 		DBName:     getEnv("DB_NAME", "gymscore"),
 			JWTSecret:  getEnv("JWT_SECRET", "gymscore_secret_key_change_in_production"),
 			AppEnv:     getEnv("APP_ENV", "development"),
-			PIXChave:   getEnv("PIX_CHAVE", "sua-chave-pix@email.com"),
-			PIXNome:    getEnv("PIX_NOME_RECEBEDOR", "GYMSCORE SISTEMA"),
-			PIXCidade:  getEnv("PIX_CIDADE_RECEBEDOR", "SAO PAULO"),
+			PIXChave:     getEnv("PIX_CHAVE", "sua-chave-pix@email.com"),
+			PIXNome:      getEnv("PIX_NOME_RECEBEDOR", "GYMSCORE SISTEMA"),
+			PIXCidade:    getEnv("PIX_CIDADE_RECEBEDOR", "SAO PAULO"),
+			AsaasAPIKey:  getEnv("ASAAS_API_KEY", ""),
+			AsaasBaseURL: getEnv("ASAAS_BASE_URL", "https://sandbox.asaas.com/api"),
 		}
 	}
 

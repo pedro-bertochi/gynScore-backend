@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"gynScore-backend/internal/client"
 	"gynScore-backend/internal/config"
 	"gynScore-backend/internal/controllers"
 	"gynScore-backend/internal/middlewares"
@@ -54,6 +55,7 @@ func main() {
 		&models.Usuario{},
 		&models.Desafio{},
 		&models.Amizade{},
+		&models.Transacao{},
 	)
 	if err != nil {
 		log.Fatalf("[FATAL] Erro ao realizar auto-migração: %v", err)
@@ -66,18 +68,23 @@ func main() {
 	usuarioRepo := repositories.NovoUsuarioRepository(db)
 	desafioRepo := repositories.NovoDesafioRepository(db)
 	amizadeRepo := repositories.NovoAmizadeRepository(db)
+	transacaoRepo := repositories.NovoTransacaoRepository(db)
+
+	// Clients
+	asaasClient := client.NewAsaasClient(cfg)
 
 	// Services
 	usuarioSvc := services.NovoUsuarioService(usuarioRepo)
 	desafioSvc := services.NovoDesafioService(desafioRepo, usuarioRepo)
 	amizadeSvc := services.NovoAmizadeService(amizadeRepo, usuarioRepo)
-	pixSvc := services.NovoPIXService(cfg, usuarioRepo)
+	pixSvc := services.NovoPIXService(asaasClient, usuarioRepo, transacaoRepo)
 
 	// Controllers
 	usuarioCtrl := controllers.NovoUsuarioController(usuarioSvc, cfg)
 	desafioCtrl := controllers.NovoDesafioController(desafioSvc)
 	amizadeCtrl := controllers.NovoAmizadeController(amizadeSvc)
 	pixCtrl := controllers.NovoPIXController(pixSvc)
+	webhookCtrl := controllers.NovoWebhookController(db, transacaoRepo, usuarioRepo)
 
 	// ─── Configuração do servidor Fiber ──────────────────────────────────────────
 	app := fiber.New(fiber.Config{
@@ -94,7 +101,7 @@ func main() {
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	// Registro das rotas
-	routes.Setup(app, cfg, usuarioCtrl, desafioCtrl, amizadeCtrl, pixCtrl)
+	routes.Setup(app, cfg, usuarioCtrl, desafioCtrl, amizadeCtrl, pixCtrl, webhookCtrl)
 
 	// ─── Inicialização do servidor ────────────────────────────────────────────────
 	addr := fmt.Sprintf(":%s", cfg.AppPort)

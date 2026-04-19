@@ -16,6 +16,7 @@ func Setup(
 	desafioCtrl *controllers.DesafioController,
 	amizadeCtrl *controllers.AmizadeController,
 	pixCtrl controllers.PIXController,
+	webhookCtrl *controllers.WebhookController,
 ) {
 	// Rota de health check
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -60,4 +61,7 @@ func Setup(
 
 	// Pagamento PIX (Depósito de Saldo)
 	protected.Post("/pagamento/pix", pixCtrl.GerarPagamento)
+
+	// Webhook Asaas (rota pública — sem JWT)
+	api.Post("/webhooks/asaas", webhookCtrl.ReceberWebhookAsaas)
 }

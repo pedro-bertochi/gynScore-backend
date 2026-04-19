@@ -69,6 +69,17 @@ CREATE TABLE IF NOT EXISTS amizades (
     FOREIGN KEY (id_amigo) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS transacoes (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_usuario BIGINT UNSIGNED NOT NULL,
+    asaas_payment_id VARCHAR(100) NOT NULL UNIQUE,
+    valor DECIMAL(10,2) NOT NULL,
+    status ENUM('pending','received','refunded') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+);
+
 -- =========================
 -- FUNCTION (SEM BEGIN)
 -- =========================
